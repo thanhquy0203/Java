@@ -1,10 +1,7 @@
 package DAO;
 
 import java.sql.Connection;
-<<<<<<< HEAD
-=======
 import java.sql.Date;
->>>>>>> d984ab10eea01d33ccd9c6a5ae99073bc4f256bd
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +43,7 @@ public class HoaDon_DAO {
 		return dshd;
 	}
 	
-<<<<<<< HEAD
+
 	public ArrayList<HoaDon> fillter(int ngay, int thang, int nam, String nv) {
 	    ArrayList<HoaDon> dshd = new ArrayList<HoaDon>();
 	    try {
@@ -69,7 +66,7 @@ public class HoaDon_DAO {
 	            LocalDate ngayBan = rs.getDate(3).toLocalDate();
 	            NhanVien maNV = new NhanVien(rs.getString(4));
 	            KhachHang maKH = new KhachHang(rs.getString(5));
-	            Ban maB = new Ban(rs.getString(6));
+	            The maB = new The(rs.getInt(6));
 	            HoaDon hd = new HoaDon(maHD, tongTien, ngayBan, maNV, maKH, maB);
 	            dshd.add(hd);
 	        }
@@ -79,7 +76,6 @@ public class HoaDon_DAO {
 	    return dshd;
 	}
 
-=======
 	public boolean insert(HoaDon hd) {
 		ConnectDB.getInstance();
 		Connection con = ConnectDB.getConnection();
@@ -106,5 +102,5 @@ public class HoaDon_DAO {
 		}
 		return n>0;
 	}
->>>>>>> d984ab10eea01d33ccd9c6a5ae99073bc4f256bd
+
 }
