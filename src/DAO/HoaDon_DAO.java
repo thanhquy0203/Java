@@ -1,6 +1,7 @@
 package DAO;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,7 +20,7 @@ public class HoaDon_DAO {
 		try {
 			ConnectDB.getInstance();
 			Connection con = ConnectDB.getConnection();
-			String sql = "select * from HOADON";
+			String sql = "select * from HOADON ORDER BY ngayBan ASC";
 			Statement statement = con.createStatement();
 			//thuc thi cau lenh sql tra ve doi tuong result
 			ResultSet rs = statement.executeQuery(sql);
@@ -39,4 +40,37 @@ public class HoaDon_DAO {
 		}
 		return dshd;
 	}
+	
+	public ArrayList<HoaDon> fillter(int ngay, int thang, int nam, String nv) {
+	    ArrayList<HoaDon> dshd = new ArrayList<HoaDon>();
+	    try {
+	        ConnectDB.getInstance();
+	        Connection con = ConnectDB.getConnection();
+	        String sql = "SELECT * FROM HOADON WHERE (DAY(ngayBan) = ? OR ? = '') AND (MONTH(ngayBan) = ? OR ? = '') AND (YEAR(ngayBan) = ? OR ? = '') AND (maNhanVien = ? OR ? = '') ORDER BY maNhanVien ASC, ngayBan ASC";
+	        PreparedStatement statement = con.prepareStatement(sql);
+	        statement.setInt(1, ngay);
+	        statement.setString(2, (ngay == 0) ? "" : String.valueOf(ngay));
+	        statement.setInt(3, thang);
+	        statement.setString(4, (thang == 0) ? "" : String.valueOf(thang));
+	        statement.setInt(5, nam);
+	        statement.setString(6, (nam == 0) ? "" : String.valueOf(nam));
+	        statement.setString(7, nv);
+	        statement.setString(8, (nv == null) ? "" : nv);
+	        ResultSet rs = statement.executeQuery();
+	        while (rs.next()) {
+	            String maHD = rs.getString(1);
+	            Double tongTien = rs.getDouble(2);
+	            LocalDate ngayBan = rs.getDate(3).toLocalDate();
+	            NhanVien maNV = new NhanVien(rs.getString(4));
+	            KhachHang maKH = new KhachHang(rs.getString(5));
+	            Ban maB = new Ban(rs.getString(6));
+	            HoaDon hd = new HoaDon(maHD, tongTien, ngayBan, maNV, maKH, maB);
+	            dshd.add(hd);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return dshd;
+	}
+
 }
