@@ -2,6 +2,7 @@ package app;
 
 import java.awt.EventQueue;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,7 +15,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 
 import ConnectDB.ConnectDB;
-import DAO.KhachHang_DAO;
 import DAO.NguyenLieu_DAO;
 import Entity.NguyenLieu;
 
@@ -27,18 +27,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
-public class NguyenLieu_app extends JFrame implements ActionListener, MouseListener {
+public class NguyenLieu_app extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -52,6 +52,12 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 	private NguyenLieu_DAO nl_dao;
 	private DefaultTableModel modelTable;
 	private JButton btnNewButton1;
+	private JTextField findma;
+	private JButton btntimma;
+	private JTextField findten;
+	private JButton btntimTen;
+	private DefaultComboBoxModel<String> donvicombobox;
+	private JComboBox comboBox;
 
 	/**
 	 * Launch the application.
@@ -246,12 +252,63 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 		panel_2.add(textField_2);
 		textField_2.setColumns(10);
 		
+		JLabel lblNewLabel_15 = new JLabel("Đơn vị");
+		lblNewLabel_15.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_15.setBounds(10, 251, 135, 29);
+		panel_2.add(lblNewLabel_15);
+		
+		String[] donVi = {"Kg","chai","lít","thùng"};
+		
+//		donvicombobox = new DefaultComboBoxModel<String>(donVi);
+		
+		comboBox = new JComboBox<>(donVi);
+        comboBox.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        comboBox.setBounds(10, 291,  278, 29);
+        panel_2.add(comboBox);
+        
+		JLabel lblNewLabel_13 = new JLabel("Tìm theo mã:");
+		lblNewLabel_13.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_13.setBounds(10, 368, 278, 25);
+		panel_2.add(lblNewLabel_13);
+
+		findma = new JTextField();
+		findma.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		findma.setBounds(10, 404, 200, 25);
+		panel_2.add(findma);
+		findma.setColumns(10);
+
+		btntimma = new JButton("Tìm");
+		
+		btntimma.setFont(new Font("Tahoma", Font.BOLD, 15));
+		btntimma.setBackground(new Color(8, 102, 255));
+		btntimma.setForeground(new Color(255, 255, 255));
+		btntimma.setBounds(220, 404, 70, 25);
+		panel_2.add(btntimma);
+		
+		JLabel lblNewLabel_14 = new JLabel("Tìm theo tên:");
+		lblNewLabel_14.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_14.setBounds(10, 444, 278, 25);
+		panel_2.add(lblNewLabel_14);
+
+		findten = new JTextField();
+		findten.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		findten.setBounds(10, 480, 200, 25);
+		panel_2.add(findten);
+		findten.setColumns(10);
+
+		btntimTen = new JButton("Tìm");
+		btntimTen.setFont(new Font("Tahoma", Font.BOLD, 15));
+		btntimTen.setBackground(new Color(8, 102, 255));
+		btntimTen.setForeground(new Color(255, 255, 255));
+		btntimTen.setBounds(220, 480, 70, 25);
+		panel_2.add(btntimTen);
+		
 		btnNewButton = new JButton("Cập nhật");
 		btnNewButton.setBackground(new Color(255, 0, 0));
 		btnNewButton.setForeground(new Color(255, 255, 255));
 		btnNewButton.setOpaque(true);
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnNewButton.setBounds(10, 584, 278, 80);
+		btnNewButton.setBounds(10, 584, 278, 50);
 		panel_2.add(btnNewButton);
 		
 		btnNewButton1 = new JButton("Thêm");
@@ -259,7 +316,7 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 		btnNewButton1.setForeground(new Color(255, 255, 255));
 		btnNewButton1.setOpaque(true);
 		btnNewButton1.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnNewButton1.setBounds(10, 500, 278, 80);
+		btnNewButton1.setBounds(10, 520, 278, 50);
 		panel_2.add(btnNewButton1);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -270,7 +327,7 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 //		scrollPane.setViewportView(table);
 		
 		
-		String[] colHeader = {"Mã nguyên liệu", "Tên Nguyên Liệu", "Số lượng"};
+		String[] colHeader = {"Mã nguyên liệu", "Tên Nguyên Liệu", "Số lượng", "Đơn vị"};
 		modelTable = new DefaultTableModel(colHeader, 0) {
 			@Override
             public boolean isCellEditable(int row, int column) {
@@ -299,6 +356,16 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 		        	textField.setText((String)modelTable.getValueAt(row, 0));
 		        	textField_1.setText((String)modelTable.getValueAt(row, 1));
 		        	textField_2.setText(String.valueOf(modelTable.getValueAt(row, 2)));
+		        	
+		        	 String donViValue = (String) modelTable.getValueAt(row, 3);
+		        	    int selectedIndex = -1;
+		        	    for (int i = 0; i < donVi.length; i++) {
+		        	        if (donVi[i].equals(donViValue)) {
+		        	            selectedIndex = i;
+		        	            break;
+		        	        }
+		        	    }
+		        	    comboBox.setSelectedIndex(selectedIndex);
 
 		        }
 			}
@@ -306,12 +373,14 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 		docDuLieuDatabaseVaoTable();
 		btnNewButton.addActionListener(this);
 		btnNewButton1.addActionListener(this);
+		btntimma.addActionListener(this);
+		btntimTen.addActionListener(this);
 	}
 	
 	private void docDuLieuDatabaseVaoTable() {
 		List<NguyenLieu> list = nl_dao.getAllTableKhachHang();
 		for (NguyenLieu nl:list) {
-			modelTable.addRow(new Object[] {nl.getMaNguyenLieu(), nl.getTenNguyenLieu(), nl.getSoLuong()});
+			modelTable.addRow(new Object[] {nl.getMaNguyenLieu(), nl.getTenNguyenLieu(), nl.getSoLuong(), nl.getDonVi()});
 		}
 	}
 	
@@ -322,12 +391,13 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 			String ma = textField.getText();
 			String ten = textField_1.getText();
 			int soluong = Integer.parseInt(textField_2.getText());
+			String donVi = (String) comboBox.getSelectedItem();
 			
-			NguyenLieu nl = new NguyenLieu(ma, ten, soluong);
+			NguyenLieu nl = new NguyenLieu(ma, ten, soluong, donVi);
 			try {
 				nl_dao.create(nl);
 				modelTable.addRow(new Object[] {
-						nl.getMaNguyenLieu(), nl.getTenNguyenLieu(),nl.getSoLuong()
+						nl.getMaNguyenLieu(), nl.getTenNguyenLieu(),nl.getSoLuong(), nl.getDonVi()
 						
 				});
 				textField.requestFocus();
@@ -343,20 +413,81 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 			String ma = textField.getText();
 			String ten = textField_1.getText();
 			int soluong = Integer.parseInt(textField_2.getText());
-			NguyenLieu nl = new NguyenLieu(ma, ten, soluong);
+			String donVi = (String) comboBox.getSelectedItem();
+			
+			NguyenLieu nl = new NguyenLieu(ma, ten, soluong, donVi);
 			
 			if(nl_dao.update(nl)) {
 				int row = table.getSelectedRow();
 				modelTable.setValueAt(nl.getMaNguyenLieu(), row, 0);
 				modelTable.setValueAt(nl.getTenNguyenLieu(), row, 1);
-				modelTable.setValueAt(nl.getSoLuong(), row, 2);
-				
+				modelTable.setValueAt(nl.getSoLuong()+ Integer.parseInt(modelTable.getValueAt(row, 2).toString()), row, 2);
+				modelTable.setValueAt(nl.getDonVi(), row, 3);
 				JOptionPane.showMessageDialog(null, "Cap nhat thanh cong");
 				
 			}
 		}
 		
+
+		if(o.equals(btntimma)) {
+		    String ma = findma.getText(); 
+		    if(ma.trim().equals("")) {
+		        JOptionPane.showMessageDialog(this, "Vui lòng nhập mã cần tìm");
+		        xoaRong();
+		        findma.requestFocus();
+		        return;
+		    }
+		    int row = table.getRowCount();
+		    for(int i = 0; i < row; i++) {
+		        if(modelTable.getValueAt(i, 0).toString().equals(ma)) {
+		            table.setRowSelectionInterval(i, i);
+		            textField.setText(modelTable.getValueAt(i, 0).toString());
+		            textField_1.setText(modelTable.getValueAt(i, 1).toString());
+		            textField_2.setText(modelTable.getValueAt(i, 2).toString());
+		            String donVi = modelTable.getValueAt(i, 3).toString();
+		            comboBox.setSelectedItem(donVi);
+		            table.scrollRectToVisible(table.getCellRect(i, 0, true));	
+		            return;
+		        }
+		    }
+		    JOptionPane.showMessageDialog(this, "Không tìm thấy mã nguyên liệu");
+		}
+		if (o.equals(btntimTen)) {
+		    String ten = findten.getText();
+		    if (ten.trim().equals("")) {
+		        JOptionPane.showMessageDialog(this, "Vui lòng nhập tên cần tìm");
+		        findten.requestFocus();
+		        return;
+		    }
+		    int row = table.getRowCount(); 
+		    for (int i = 0; i < row; i++) {
+		        if (modelTable.getValueAt(i, 1).toString().contains(ten)) {
+		            table.setRowSelectionInterval(i, i);
+		    
+		            textField.setText(modelTable.getValueAt(i, 0).toString());
+		            textField_1.setText(modelTable.getValueAt(i, 1).toString());
+		            textField_2.setText(modelTable.getValueAt(i, 2).toString());
+		            String donVi = modelTable.getValueAt(i, 3).toString();
+		            comboBox.setSelectedItem(donVi);
+		            table.scrollRectToVisible(table.getCellRect(i, 0, true));
+		            return;
+		        }
+		    }
+		    JOptionPane.showMessageDialog(this, "Không tìm thấy tên nguyên liệu");
+		}
+
+
 	}
+	
+	
+
+	private void xoaRong() {
+		textField.setText("");
+		textField_1.setText("");
+		textField_2.setText("");
+	}
+	
+	
 	
 	//phương thức đóng menu
 	protected void closeMenuBar() {
@@ -385,35 +516,7 @@ public class NguyenLieu_app extends JFrame implements ActionListener, MouseListe
 		
 	}
 
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	
 }
