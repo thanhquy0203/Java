@@ -206,7 +206,7 @@ public class ThongKeHoaDon extends JFrame {
 		scrollPane.setBounds(0, 0, 1021, 273);
 		panel_3.add(scrollPane);
 
-		String[] colHeader = { "Mã hóa đơn", "Tổng tiền", "Ngày Bán", "Mã Nhân Viên", "Mã Khách Hàng", "Mã Bàn" };
+		String[] colHeader = { "Mã hóa đơn", "Tổng tiền", "Ngày Bán", "Mã Nhân Viên", "Mã Khách Hàng", "Số thẻ" };
 		modelTable = new DefaultTableModel(colHeader, 0) {
 			/**
 			 * 
@@ -248,7 +248,7 @@ public class ThongKeHoaDon extends JFrame {
 					ngayban.setText(((LocalDate) modelTable.getValueAt(row, 2)).toString());
 					manv.setText((String) modelTable.getValueAt(row, 3));
 					makh.setText((String) modelTable.getValueAt(row, 4));
-					maban.setText((String) modelTable.getValueAt(row, 5));
+					maban.setText((String) modelTable.getValueAt(row, 5).toString());
 				}
 			}
 		});
@@ -283,7 +283,7 @@ public class ThongKeHoaDon extends JFrame {
 		lblNewLabel_1_4.setBounds(398, 512, 128, 51);
 		panel_1.add(lblNewLabel_1_4);
 
-		JLabel lblNewLabel_1_5 = new JLabel("Mã bàn :");
+		JLabel lblNewLabel_1_5 = new JLabel("Số thẻ :");
 		lblNewLabel_1_5.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_5.setFont(new Font("Tahoma", Font.BOLD, 18));
 		lblNewLabel_1_5.setBounds(872, 512, 164, 51);
@@ -438,7 +438,7 @@ public class ThongKeHoaDon extends JFrame {
 		for (HoaDon hd : list) {
 			modelTable.addRow(new Object[] { hd.getMaHoaDon(), hd.getTongTien(), hd.getNgayBan(),
 					hd.getMaNhanVien().getMaNhanVien(), hd.getMaKhachHang().getMaKhachHang(),
-					hd.getMaBan().getMaBan() });
+					hd.getSoThe().getSoThe() });
 		}
 	}
 
@@ -454,7 +454,7 @@ public class ThongKeHoaDon extends JFrame {
 		for (HoaDon hd : list) {
 			modelTable.addRow(new Object[] { hd.getMaHoaDon(), hd.getTongTien(), hd.getNgayBan(),
 					hd.getMaNhanVien().getMaNhanVien(), hd.getMaKhachHang().getMaKhachHang(),
-					hd.getMaBan().getMaBan() });
+					hd.getSoThe().getSoThe() });
 		}
 	}
 }
