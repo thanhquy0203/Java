@@ -2,31 +2,31 @@ package Entity;
 
 import java.util.Objects;
 
-public class Ban {
-	private String maBan;
+public class The {
+	private int soThe;
 	private String tinhTrang;
 	
-	public Ban() {
+	public The() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public Ban(String maBan) {
+	public The(int soThe) {
 		super();
-		this.maBan= maBan;
+		this.soThe = soThe;
 	}
 
-	public Ban(String maBan, String tinhTrang) {
+	public The(int soThe, String tinhTrang) {
 		super();
-		this.maBan = maBan;
+		this.soThe = soThe;
 		this.tinhTrang = tinhTrang;
 	}
 
-	public String getMaBan() {
-		return maBan;
+	public int getSoThe() {
+		return soThe;
 	}
 
-	public void setMaBan(String maBan) {
-		this.maBan = maBan;
+	public void setSoThe(int soThe) {
+		this.soThe = soThe;
 	}
 
 	public String getTinhTrang() {
@@ -39,7 +39,7 @@ public class Ban {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(maBan);
+		return Objects.hash(soThe);
 	}
 
 	@Override
@@ -50,7 +50,14 @@ public class Ban {
 			return false;
 //		if (getClass() != obj.getClass())
 //			return false;
-		Ban other = (Ban) obj;
-		return Objects.equals(maBan, other.maBan);
+		The other = (The) obj;
+		return soThe == other.soThe;
 	}
+
+	@Override
+	public String toString() {
+		return "The [soThe=" + soThe + ", tinhTrang=" + tinhTrang + "]";
+	}
+
+	
 }
