@@ -1,32 +1,52 @@
 package app;
-
+import Entity.NguyenLieu;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import ConnectDB.ConnectDB;
+import DAO.NguyenLieu_DAO;
+
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 
-public class DatNguyenLieu extends JFrame {
+public class DatNguyenLieu extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private Container sideMenu;
 	private JTextField nhapSL;
 	private JTextField textField;
+	private NguyenLieu_DAO nl_dao;
+	private JComboBox<String> comboBox;
+	private DefaultTableModel modelTable;
+	private JTable table;
+	private JComboBox<String> comboBox2;
+	private JButton dat;
+	
 
 	/**
 	 * Launch the application.
@@ -48,6 +68,13 @@ public class DatNguyenLieu extends JFrame {
 	 * Create the frame.
 	 */
 	public DatNguyenLieu() {
+		try {
+			ConnectDB.getInstance().connect();
+			System.out.println("Connected!!");
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		nl_dao=new NguyenLieu_DAO();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1435, 782);
 		contentPane = new JPanel();
@@ -171,18 +198,30 @@ public class DatNguyenLieu extends JFrame {
 		lblNewLabel_1_1.setBounds(10, 103, 140, 37);
 		panel_3.add(lblNewLabel_1_1);
 		
+		JLabel lblNewLabel_1_1_1 = new JLabel("Đơn vị");
+		lblNewLabel_1_1_1.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_1_1_1.setBounds(10, 195, 140, 37);
+		panel_3.add(lblNewLabel_1_1_1);
+		
 		nhapSL = new JTextField();
 		nhapSL.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		nhapSL.setColumns(10);
 		nhapSL.setBounds(10, 151, 202, 33);
 		panel_3.add(nhapSL);
 		
-		JComboBox comboBox = new JComboBox();
+		comboBox = new JComboBox<String>();
 		comboBox.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		comboBox.setBounds(10, 59, 202, 33);
 		panel_3.add(comboBox);
+		docDuLieuDatacbb("tenNguyenLieu");
 		
-		JButton dat = new JButton("Đặt");
+		comboBox2 = new JComboBox<String>();
+		comboBox2.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		comboBox2.setBounds(10, 243, 202, 33);
+		panel_3.add(comboBox2);
+		docDuLieuDatacbb("donVi");
+		
+		 dat = new JButton("Đặt");
 		dat.setForeground(Color.WHITE);
 		dat.setFont(new Font("Tahoma", Font.BOLD, 20));
 		dat.setBackground(Color.RED);
@@ -199,5 +238,99 @@ public class DatNguyenLieu extends JFrame {
 		textField.setBounds(10, 535, 155, 20);
 		panel_3.add(textField);
 		textField.setColumns(10);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(696, 80, 723, 664);
+		panel_1.add(scrollPane);
+		
+//		table = new JTable();
+//		scrollPane.setViewportView(table);
+		
+		
+		String[] colHeader = {"Mã nguyên liệu", "Tên Nguyên Liệu", "Số lượng", "Đơn vị"};
+		modelTable = new DefaultTableModel(colHeader, 0) {
+			@Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+		}
+		};
+		table = new JTable(modelTable);
+		table.getTableHeader().setResizingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFont(new java.awt.Font("Tahoma", java.awt.Font.PLAIN, 15));
+		scrollPane.setViewportView(table);
+		scrollPane.setColumnHeader(new JViewport() {
+			@Override public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.height = 32;
+				return d;
+			}
+		});
+		table.setRowHeight(table.getRowHeight()+10);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table.getSelectedRow();
+		        if (row >= 0) {
+		        	comboBox.setSelectedIndex(row);
+		        	comboBox2.setSelectedIndex(row);
+
+		        }
+			}
+		});
+		docDuLieuDatabaseVaoTable();
+		dat.addActionListener(this);
+	}
+	
+	private void docDuLieuDatacbb(String type) {
+	    List<NguyenLieu> list = nl_dao.getAllTableKhachHang();
+	    for (NguyenLieu nv : list) {
+	        if (type.equals("tenNguyenLieu")) {
+	            comboBox.addItem(nv.getTenNguyenLieu());
+	        } else if (type.equals("donVi")) {
+	            comboBox2.addItem(nv.getDonVi());
+	        }
+	    }
+	}
+
+	
+	private void docDuLieuDatabaseVaoTable() {
+		List<NguyenLieu> list = nl_dao.getAllTableKhachHang();
+		for (NguyenLieu nl:list) {
+			modelTable.addRow(new Object[] {nl.getMaNguyenLieu(), nl.getTenNguyenLieu(), nl.getSoLuong(), nl.getDonVi()});
+		}
+	}
+
+	@Override
+		public void actionPerformed(ActionEvent e) {
+			Object o =e.getSource();
+			if(o.equals(dat)) {
+				String soluong = nhapSL.getText();
+				   if (!soluong.isEmpty()) { 
+				        try {
+				            int sl = Integer.parseInt(soluong);
+				            String ma = textField.getText();
+							String ten = (String) comboBox.getSelectedItem();
+							String donVi = (String) comboBox2.getSelectedItem();
+							
+							NguyenLieu nl = new NguyenLieu(ma, ten, sl, donVi);
+							
+							if(nl_dao.datNL(nl)) {
+								int row = table.getSelectedRow();
+								
+								modelTable.setValueAt(nl.getSoLuong()+ Integer.parseInt(modelTable.getValueAt(row, 2).toString()), row, 2);
+								
+								JOptionPane.showMessageDialog(null, "Cap nhat thanh cong");
+							}
+				        } catch (Exception e1) {
+				            JOptionPane.showMessageDialog(this, "Số lượng là số");
+				        }
+				    } else {
+				    	JOptionPane.showMessageDialog(this, "Vui lòng nhập số lượng");
+				        
+				    }
+			}
+			
 	}
 }

@@ -2,27 +2,43 @@ package app;
 
 import java.awt.EventQueue;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+
+import ConnectDB.ConnectDB;
+import DAO.NguyenLieu_DAO;
+import Entity.NguyenLieu;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
-public class NguyenLieu_app extends JFrame {
+public class NguyenLieu_app extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -33,6 +49,15 @@ public class NguyenLieu_app extends JFrame {
 	private JTable table;
 	private JButton btnNewButton;
 	private JPanel panel_2;
+	private NguyenLieu_DAO nl_dao;
+	private DefaultTableModel modelTable;
+	private JButton btnNewButton1;
+	private JTextField findma;
+	private JButton btntimma;
+	private JTextField findten;
+	private JButton btntimTen;
+	private DefaultComboBoxModel<String> donvicombobox;
+	private JComboBox comboBox;
 
 	/**
 	 * Launch the application.
@@ -55,6 +80,14 @@ public class NguyenLieu_app extends JFrame {
 	 * Create the frame.
 	 */
 	public NguyenLieu_app() {
+		try {
+			ConnectDB.getInstance().connect();
+			System.out.println("Connected!!");
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		nl_dao=new NguyenLieu_DAO();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1435, 782);
 		contentPane = new JPanel();
@@ -219,21 +252,242 @@ public class NguyenLieu_app extends JFrame {
 		panel_2.add(textField_2);
 		textField_2.setColumns(10);
 		
+		JLabel lblNewLabel_15 = new JLabel("Đơn vị");
+		lblNewLabel_15.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_15.setBounds(10, 251, 135, 29);
+		panel_2.add(lblNewLabel_15);
+		
+		String[] donVi = {"Kg","chai","lít","thùng"};
+		
+//		donvicombobox = new DefaultComboBoxModel<String>(donVi);
+		
+		comboBox = new JComboBox<>(donVi);
+        comboBox.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        comboBox.setBounds(10, 291,  278, 29);
+        panel_2.add(comboBox);
+        
+		JLabel lblNewLabel_13 = new JLabel("Tìm theo mã:");
+		lblNewLabel_13.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_13.setBounds(10, 368, 278, 25);
+		panel_2.add(lblNewLabel_13);
+
+		findma = new JTextField();
+		findma.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		findma.setBounds(10, 404, 200, 25);
+		panel_2.add(findma);
+		findma.setColumns(10);
+
+		btntimma = new JButton("Tìm");
+		
+		btntimma.setFont(new Font("Tahoma", Font.BOLD, 15));
+		btntimma.setBackground(new Color(8, 102, 255));
+		btntimma.setForeground(new Color(255, 255, 255));
+		btntimma.setBounds(220, 404, 70, 25);
+		panel_2.add(btntimma);
+		
+		JLabel lblNewLabel_14 = new JLabel("Tìm theo tên:");
+		lblNewLabel_14.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblNewLabel_14.setBounds(10, 444, 278, 25);
+		panel_2.add(lblNewLabel_14);
+
+		findten = new JTextField();
+		findten.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		findten.setBounds(10, 480, 200, 25);
+		panel_2.add(findten);
+		findten.setColumns(10);
+
+		btntimTen = new JButton("Tìm");
+		btntimTen.setFont(new Font("Tahoma", Font.BOLD, 15));
+		btntimTen.setBackground(new Color(8, 102, 255));
+		btntimTen.setForeground(new Color(255, 255, 255));
+		btntimTen.setBounds(220, 480, 70, 25);
+		panel_2.add(btntimTen);
+		
 		btnNewButton = new JButton("Cập nhật");
 		btnNewButton.setBackground(new Color(255, 0, 0));
 		btnNewButton.setForeground(new Color(255, 255, 255));
 		btnNewButton.setOpaque(true);
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnNewButton.setBounds(10, 584, 278, 80);
+		btnNewButton.setBounds(10, 584, 278, 50);
 		panel_2.add(btnNewButton);
+		
+		btnNewButton1 = new JButton("Thêm");
+		btnNewButton1.setBackground(new Color(255, 0, 0));
+		btnNewButton1.setForeground(new Color(255, 255, 255));
+		btnNewButton1.setOpaque(true);
+		btnNewButton1.setFont(new Font("Tahoma", Font.BOLD, 20));
+		btnNewButton1.setBounds(10, 520, 278, 50);
+		panel_2.add(btnNewButton1);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(696, 80, 723, 664);
 		panel_1.add(scrollPane);
 		
-		table = new JTable();
+//		table = new JTable();
+//		scrollPane.setViewportView(table);
+		
+		
+		String[] colHeader = {"Mã nguyên liệu", "Tên Nguyên Liệu", "Số lượng", "Đơn vị"};
+		modelTable = new DefaultTableModel(colHeader, 0) {
+			@Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+		}
+		};
+		table = new JTable(modelTable);
+		table.getTableHeader().setResizingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFont(new java.awt.Font("Tahoma", java.awt.Font.PLAIN, 15));
 		scrollPane.setViewportView(table);
+		scrollPane.setColumnHeader(new JViewport() {
+			@Override public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.height = 32;
+				return d;
+			}
+		});
+		table.setRowHeight(table.getRowHeight()+10);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table.getSelectedRow();
+		        if (row >= 0) {
+		        	textField.setText((String)modelTable.getValueAt(row, 0));
+		        	textField_1.setText((String)modelTable.getValueAt(row, 1));
+		        	textField_2.setText(String.valueOf(modelTable.getValueAt(row, 2)));
+		        	
+		        	 String donViValue = (String) modelTable.getValueAt(row, 3);
+		        	    int selectedIndex = -1;
+		        	    for (int i = 0; i < donVi.length; i++) {
+		        	        if (donVi[i].equals(donViValue)) {
+		        	            selectedIndex = i;
+		        	            break;
+		        	        }
+		        	    }
+		        	    comboBox.setSelectedIndex(selectedIndex);
+
+		        }
+			}
+		});
+		docDuLieuDatabaseVaoTable();
+		btnNewButton.addActionListener(this);
+		btnNewButton1.addActionListener(this);
+		btntimma.addActionListener(this);
+		btntimTen.addActionListener(this);
 	}
+	
+	private void docDuLieuDatabaseVaoTable() {
+		List<NguyenLieu> list = nl_dao.getAllTableKhachHang();
+		for (NguyenLieu nl:list) {
+			modelTable.addRow(new Object[] {nl.getMaNguyenLieu(), nl.getTenNguyenLieu(), nl.getSoLuong(), nl.getDonVi()});
+		}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object o = e.getSource();
+		if(o.equals(btnNewButton1)) {
+			String ma = textField.getText();
+			String ten = textField_1.getText();
+			int soluong = Integer.parseInt(textField_2.getText());
+			String donVi = (String) comboBox.getSelectedItem();
+			
+			NguyenLieu nl = new NguyenLieu(ma, ten, soluong, donVi);
+			try {
+				nl_dao.create(nl);
+				modelTable.addRow(new Object[] {
+						nl.getMaNguyenLieu(), nl.getTenNguyenLieu(),nl.getSoLuong(), nl.getDonVi()
+						
+				});
+				textField.requestFocus();
+				
+				;
+			}catch (Exception e1) {
+				
+				JOptionPane.showMessageDialog(this, "Trung");
+			}
+		}
+		
+		if(o.equals(btnNewButton)) {
+			String ma = textField.getText();
+			String ten = textField_1.getText();
+			int soluong = Integer.parseInt(textField_2.getText());
+			String donVi = (String) comboBox.getSelectedItem();
+			
+			NguyenLieu nl = new NguyenLieu(ma, ten, soluong, donVi);
+			
+			if(nl_dao.update(nl)) {
+				int row = table.getSelectedRow();
+				modelTable.setValueAt(nl.getMaNguyenLieu(), row, 0);
+				modelTable.setValueAt(nl.getTenNguyenLieu(), row, 1);
+				modelTable.setValueAt(nl.getSoLuong()+ Integer.parseInt(modelTable.getValueAt(row, 2).toString()), row, 2);
+				modelTable.setValueAt(nl.getDonVi(), row, 3);
+				JOptionPane.showMessageDialog(null, "Cap nhat thanh cong");
+				
+			}
+		}
+		
+
+		if(o.equals(btntimma)) {
+		    String ma = findma.getText(); 
+		    if(ma.trim().equals("")) {
+		        JOptionPane.showMessageDialog(this, "Vui lòng nhập mã cần tìm");
+		        xoaRong();
+		        findma.requestFocus();
+		        return;
+		    }
+		    int row = table.getRowCount();
+		    for(int i = 0; i < row; i++) {
+		        if(modelTable.getValueAt(i, 0).toString().equals(ma)) {
+		            table.setRowSelectionInterval(i, i);
+		            textField.setText(modelTable.getValueAt(i, 0).toString());
+		            textField_1.setText(modelTable.getValueAt(i, 1).toString());
+		            textField_2.setText(modelTable.getValueAt(i, 2).toString());
+		            String donVi = modelTable.getValueAt(i, 3).toString();
+		            comboBox.setSelectedItem(donVi);
+		            table.scrollRectToVisible(table.getCellRect(i, 0, true));	
+		            return;
+		        }
+		    }
+		    JOptionPane.showMessageDialog(this, "Không tìm thấy mã nguyên liệu");
+		}
+		if (o.equals(btntimTen)) {
+		    String ten = findten.getText();
+		    if (ten.trim().equals("")) {
+		        JOptionPane.showMessageDialog(this, "Vui lòng nhập tên cần tìm");
+		        findten.requestFocus();
+		        return;
+		    }
+		    int row = table.getRowCount(); 
+		    for (int i = 0; i < row; i++) {
+		        if (modelTable.getValueAt(i, 1).toString().contains(ten)) {
+		            table.setRowSelectionInterval(i, i);
+		    
+		            textField.setText(modelTable.getValueAt(i, 0).toString());
+		            textField_1.setText(modelTable.getValueAt(i, 1).toString());
+		            textField_2.setText(modelTable.getValueAt(i, 2).toString());
+		            String donVi = modelTable.getValueAt(i, 3).toString();
+		            comboBox.setSelectedItem(donVi);
+		            table.scrollRectToVisible(table.getCellRect(i, 0, true));
+		            return;
+		        }
+		    }
+		    JOptionPane.showMessageDialog(this, "Không tìm thấy tên nguyên liệu");
+		}
+
+
+	}
+	
+	
+
+	private void xoaRong() {
+		textField.setText("");
+		textField_1.setText("");
+		textField_2.setText("");
+	}
+	
+	
 	
 	//phương thức đóng menu
 	protected void closeMenuBar() {
@@ -261,4 +515,8 @@ public class NguyenLieu_app extends JFrame {
 		}).start();
 		
 	}
+
+
+
+	
 }

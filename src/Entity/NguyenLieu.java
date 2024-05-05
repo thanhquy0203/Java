@@ -6,6 +6,8 @@ public class NguyenLieu {
 	private String maNguyenLieu;
 	private String tenNguyenLieu;
 	private int soLuong;
+	private String donVi;
+	
 	
 	public NguyenLieu() {
 		// TODO Auto-generated constructor stub
@@ -16,11 +18,13 @@ public class NguyenLieu {
 		this.maNguyenLieu=maNguyenLieu;
 	}
 
-	public NguyenLieu(String maNguyenLieu, String tenNguyenLieu, int soLuong) {
+
+	public NguyenLieu(String maNguyenLieu, String tenNguyenLieu, int soLuong, String donVi) {
 		super();
 		this.maNguyenLieu = maNguyenLieu;
 		this.tenNguyenLieu = tenNguyenLieu;
 		this.soLuong = soLuong;
+		this.donVi = donVi;
 	}
 
 	public String getMaNguyenLieu() {
@@ -46,6 +50,16 @@ public class NguyenLieu {
 	public void setSoLuong(int soLuong) {
 		this.soLuong = soLuong;
 	}
+	
+	
+
+	public String getDonVi() {
+		return donVi;
+	}
+
+	public void setDonVi(String donVi) {
+		this.donVi = donVi;
+	}
 
 	@Override
 	public int hashCode() {
@@ -67,8 +81,10 @@ public class NguyenLieu {
 	@Override
 	public String toString() {
 		return "NguyenLieu [maNguyenLieu=" + maNguyenLieu + ", tenNguyenLieu=" + tenNguyenLieu + ", soLuong=" + soLuong
-				+ "]";
+				+ ", donVi=" + donVi + "]";
 	}
+
+	
 
 	
 	
