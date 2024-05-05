@@ -9,7 +9,7 @@ public class HoaDon {
 	private LocalDate ngayBan;
 	private NhanVien maNhanVien;
 	private KhachHang maKhachHang;
-	private Ban maBan;
+	private The soThe;
 	
 	public HoaDon() {
 		// TODO Auto-generated constructor stub
@@ -20,15 +20,17 @@ public class HoaDon {
 		this.maHoaDon=maHoaDon;
 	}
 
-	public HoaDon(String maHoaDon, double tongTien, LocalDate ngayBan, NhanVien maNhanVien, KhachHang maKhachHang,Ban maBan) {
+	public HoaDon(String maHoaDon, double tongTien, LocalDate ngayBan, NhanVien maNhanVien, KhachHang maKhachHang,The soThe) {
 		super();
 		this.maHoaDon = maHoaDon;
 		this.tongTien = tongTien;
 		this.ngayBan = ngayBan;
 		this.maNhanVien = maNhanVien;
 		this.maKhachHang=maKhachHang;
-		this.maBan = maBan;
+		this.soThe = soThe;
 	}
+
+	
 
 	public String getMaHoaDon() {
 		return maHoaDon;
@@ -62,20 +64,20 @@ public class HoaDon {
 		this.maNhanVien = maNhanVien;
 	}
 
-	public Ban getMaBan() {
-		return maBan;
-	}
-
-	public void setMaBan(Ban maBan) {
-		this.maBan = maBan;
-	}
-
 	public KhachHang getMaKhachHang() {
 		return maKhachHang;
 	}
 
 	public void setMaKhachHang(KhachHang maKhachHang) {
 		this.maKhachHang = maKhachHang;
+	}
+
+	public The getSoThe() {
+		return soThe;
+	}
+
+	public void setSoThe(The soThe) {
+		this.soThe = soThe;
 	}
 
 	@Override
@@ -98,7 +100,7 @@ public class HoaDon {
 	@Override
 	public String toString() {
 		return "HoaDon [maHoaDon=" + maHoaDon + ", tongTien=" + tongTien + ", ngayBan=" + ngayBan + ", maNhanVien="
-				+ maNhanVien + ", maKhachHang=" + maKhachHang + ", maBan=" + maBan + "]";
+				+ maNhanVien + ", maKhachHang=" + maKhachHang + ", soThe=" + soThe + "]";
 	}
 
 	

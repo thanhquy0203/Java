@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -42,18 +43,23 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 import ConnectDB.ConnectDB;
+import DAO.ChiTietHoaDon_DAO;
 import DAO.DoUong_DAO;
 import DAO.HoaDon_DAO;
 import DAO.KhachHang_DAO;
 import DAO.NhanVien_DAO;
+import DAO.The_DAO;
+import Entity.ChiTietHoaDon;
 import Entity.DoUong;
 import Entity.HoaDon;
 import Entity.KhachHang;
 import Entity.NhanVien;
+import Entity.The;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.JTextArea;
 
 public class ThanhToan extends JFrame {
 
@@ -84,6 +90,8 @@ public class ThanhToan extends JFrame {
 	private JTextField nhapTenKH;
 	private JTextField nhapTienGiam;
 	private JLabel lblClock;
+	private ChiTietHoaDon_DAO cthd_dao;
+	private The_DAO the_dao;
 	/**
 	 * Launch the application.
 	 */
@@ -115,6 +123,8 @@ public class ThanhToan extends JFrame {
 		hd_dao=new HoaDon_DAO();
 		nv_dao=new NhanVien_DAO();
 		kh_dao=new KhachHang_DAO();
+		cthd_dao=new ChiTietHoaDon_DAO();
+		the_dao = new The_DAO();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1435, 782);
@@ -127,6 +137,17 @@ public class ThanhToan extends JFrame {
 		Image image = imageIcon.getImage();
 		Image newimg = image.getScaledInstance(368, 239,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 		imageIcon = new ImageIcon(newimg);
+		
+		JPanel panel_7 = new JPanel();
+		panel_7.setBounds(0, 0, 534, 404);
+		contentPane.add(panel_7);
+		panel_7.setLayout(null);
+		
+		JTextArea hoaDon = new JTextArea();
+		hoaDon.setBounds(10, 11, 520, 385);
+		hoaDon.setFont(new Font("Monospaced", Font.BOLD, 18));
+		panel_7.add(hoaDon);
+		panel_7.setVisible(false);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(255, 255, 255));
@@ -405,6 +426,11 @@ public class ThanhToan extends JFrame {
 		
 		JComboBox theRung = new JComboBox();
 		theRung.setBounds(115, 52, 96, 22);
+		ArrayList<The> listT = the_dao.getAllTableThe();
+		for (The t : listT) {
+			if(t.getTinhTrang().equals("Trong"))
+				theRung.addItem(t.getSoThe());
+		}
 		panel_3.add(theRung);
 		
 		JLabel lblNewLabel_1_1_1_1 = new JLabel("Thành tiền :");
@@ -623,12 +649,31 @@ public class ThanhToan extends JFrame {
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 15));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int row = table_1.getSelectedRow();
+				if (row >= 0) {
+					modelTable_1.removeRow(row);
+					capNhatDuLieu();
+					capNhatGiam();
+					capNhatTienGiam();
+					capNhatTienThoi();
+				} else {
+					JOptionPane.showMessageDialog(null, "Vui lòng chọn dòng cần xóa!");
+				}
 			}
 		});
 		btnNewButton.setBounds(10, 246, 114, 37);
 		panel_4.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("Xóa tất cả");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modelTable_1.setRowCount(0);
+				capNhatDuLieu();
+				capNhatGiam();
+				capNhatTienGiam();
+				capNhatTienThoi();
+			}
+		});
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 15));
 		btnNewButton_1.setBounds(160, 246, 114, 37);
 		panel_4.add(btnNewButton_1);
@@ -771,6 +816,78 @@ public class ThanhToan extends JFrame {
 		panel_6.setLayout(null);
 		
 		JButton btnNewButton_2 = new JButton("Tạo hóa đơn");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(nhapTongTien.getText().equals("0.0") || nhapTongTien.getText().trim().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Chưa có món để tạo hóa đơn!");
+				} else {
+					try {
+						hoaDon.setText("--------------------------------------\n");
+						hoaDon.setText(hoaDon.getText() + "-              Coffee ABC            -\n");
+						hoaDon.setText(hoaDon.getText() + "--------------------------------------\n");
+						hoaDon.setText(hoaDon.getText() + "\nNgày : "+nhapNgay.getText()+"\n");
+						hoaDon.setText(hoaDon.getText() + "\nMã hóa đơn : "+nhapHD.getText()+"\n");
+						hoaDon.setText(hoaDon.getText() + "Mã nhân viên : "+nhapNV.getText()+"\n");
+						if(nhapTenKH.getText().equals("")||nhapTenKH.getText().trim().isEmpty())
+							hoaDon.setText(hoaDon.getText() + "Tên khách hàng : Khách hàng vãng lai\n");
+						else
+							hoaDon.setText(hoaDon.getText() + "Tên khách hàng : "+nhapTenKH.getText()+"\n");
+						hoaDon.setText(hoaDon.getText()+"Số thẻ : "+theRung.getSelectedItem()+"\n");
+						hoaDon.setText(hoaDon.getText() + "--------------------------------------\n");
+						hoaDon.setText(hoaDon.getText() +"\nTT Tên món       SL    Đơn giá   Thành tiền\n");
+						for(int i = 0 ; i<modelTable_1.getRowCount();i++) {
+							String line = formatRow(i+1,modelTable_1.getValueAt(i, 0).toString(),modelTable_1.getValueAt(i, 2).toString(),modelTable_1.getValueAt(i, 1).toString(),modelTable_1.getValueAt(i, 3).toString());
+							hoaDon.setText(hoaDon.getText() + line);
+						}
+						hoaDon.setText(hoaDon.getText() + "--------------------------------------\n");
+						hoaDon.setText(hoaDon.getText()+"\nTổng tiền      :\t"+nhapTongTien.getText()+"\n");
+						hoaDon.setText(hoaDon.getText()+"VAT (10%)      :\t"+nhapVAT.getText()+"\n");
+						hoaDon.setText(hoaDon.getText()+"Giảm giá       :\t"+nhapTienGiam.getText()+"\n");
+						hoaDon.setText(hoaDon.getText()+"Thành tiền     :\t"+nhapThanhTien.getText()+"\n");
+						hoaDon.setText(hoaDon.getText()+"Tiền khách đưa :\t"+nhapTienDua.getText()+"\n");
+						hoaDon.setText(hoaDon.getText()+"Tiền thừa      :\t"+nhapTienThoi.getText()+"\n");
+						hoaDon.print();
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
+					String maHD = nhapHD.getText();
+					Double tt = Double.parseDouble(nhapThanhTien.getText());
+					String ngayBanString = nhapNgay.getText();
+				    LocalDate ngayBan = LocalDate.parse(ngayBanString);
+				    String maNV = nhapNV.getText();
+				    NhanVien nv = new NhanVien(maNV);
+				    KhachHang kh1 = null;
+				    List<KhachHang> listKH = kh_dao.getAllTableKhachHang();
+				    for (KhachHang kh : listKH) {
+				    	if(kh.getSoDienThoai().equals(nhapSDT.getText())) {
+				    		String maKH = kh.getMaKhachHang();
+				    		kh1 = new KhachHang(maKH);
+				    		break;
+				    	}
+				    }
+				    int soThe = Integer.parseInt(theRung.getSelectedItem().toString());
+				    The the = new The(soThe);
+					HoaDon hd = new HoaDon(maHD, tt, ngayBan, nv, kh1, the);
+					hd_dao.insert(hd);
+					for(int i = 0 ; i<modelTable_1.getRowCount();i++) {
+						HoaDon hd1 = new HoaDon(maHD);
+						List<DoUong> dU = du_dao.getAllTableDoUong();
+						DoUong dU1 = null;
+						for(DoUong doU : dU) {
+							if(modelTable_1.getValueAt(i, 0).toString().equals(doU.getTenDoUong())) {
+								String maDoUong = doU.getMaDoUong();
+								dU1 = new DoUong(maDoUong);
+								break;
+							}
+						}
+						int soL = Integer.parseInt(modelTable_1.getValueAt(i, 2).toString());
+						double donGia = Double.parseDouble(modelTable_1.getValueAt(i, 1).toString());
+						ChiTietHoaDon ct = new ChiTietHoaDon(hd1, dU1, soL,donGia);
+						cthd_dao.insert(ct);
+					}
+				}
+			}
+		});
 		btnNewButton_2.setBackground(Color.RED);
 		btnNewButton_2.setForeground(Color.WHITE);
 		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -910,5 +1027,9 @@ public class ThanhToan extends JFrame {
 		};
 		clock.start();
 		
+	}
+	
+	public String formatRow(int stt,String item, String quantity, String price, String total) {
+	    return String.format("%-2d %-13s %-5s %-9s %-10s\n",stt, item, quantity, price, total);
 	}
 }
