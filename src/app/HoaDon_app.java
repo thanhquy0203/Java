@@ -3,11 +3,13 @@ package app;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -16,13 +18,27 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+
+import ConnectDB.ConnectDB;
+import DAO.ChiTietHoaDon_DAO;
+import DAO.DoUong_DAO;
+import DAO.HoaDon_DAO;
+import DAO.KhachHang_DAO;
+import DAO.NhanVien_DAO;
+import DAO.The_DAO;
+import Entity.ChiTietHoaDon;
+import Entity.DoUong;
+import Entity.HoaDon;
 
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import java.util.Date;
+import java.util.List;
 import java.util.Arrays;
 import java.util.Calendar;
 import javax.swing.JComboBox;
@@ -39,14 +55,16 @@ public class HoaDon_app extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private Container sideMenu;
-	private JTextField textField;
-	private JTextField textField_1;
 	private JComboBox day;
 	private JComboBox month;
 	private JComboBox year;
-	private JButton btnNewButton;
+	private JButton tim;
 	private JPanel panel_2;
 	private JTable table;
+	private DefaultTableModel modelTable;
+	private HoaDon_DAO hd_dao;
+	private ChiTietHoaDon_DAO cthd_dao;
+	private JPanel panel_3;
 
 	/**
 	 * Launch the application.
@@ -68,6 +86,15 @@ public class HoaDon_app extends JFrame {
 	 * Create the frame.
 	 */
 	public HoaDon_app() {
+		try {
+			ConnectDB.getInstance().connect();
+			System.out.println("Connected!!");
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		hd_dao=new HoaDon_DAO();
+		cthd_dao=new ChiTietHoaDon_DAO();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1662, 907);
 		contentPane = new JPanel();
@@ -192,41 +219,30 @@ public class HoaDon_app extends JFrame {
 		lblNewLabel_8.setBounds(10, 11, 1626, 45);
 		panel.add(lblNewLabel_8);
 		
-		panel_2 = new JPanel();
-		panel_2.setBounds(388, 69, 289, 799);
-		panel_1.add(panel_2);
-		panel_2.setLayout(null);
+		panel_3 = new JPanel();
+		panel_3.setBounds(388, 69, 289, 799);
+		panel_1.add(panel_3);
+		panel_3.setLayout(null);
 		
 		JLabel lblNewLabel_10 = new JLabel("Mã hóa đơn :");
 		lblNewLabel_10.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblNewLabel_10.setBounds(10, 11, 269, 25);
-		panel_2.add(lblNewLabel_10);
+		panel_3.add(lblNewLabel_10);
 		
-		textField = new JTextField();
-		textField.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		textField.setBounds(10, 47, 269, 25);
-		panel_2.add(textField);
-		textField.setColumns(10);
-		
-		JLabel lblNewLabel_11 = new JLabel("Tổng tiền :");
+		JLabel lblNewLabel_11 = new JLabel("Mã khách hàng :");
 		lblNewLabel_11.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblNewLabel_11.setBounds(10, 83, 269, 25);
-		panel_2.add(lblNewLabel_11);
-		
-		textField_1 = new JTextField();
-		textField_1.setBounds(10, 119, 269, 25);
-		panel_2.add(textField_1);
-		textField_1.setColumns(10);
+		panel_3.add(lblNewLabel_11);
 		
 		JLabel lblNewLabel_12 = new JLabel("Ngày bán :");
 		lblNewLabel_12.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblNewLabel_12.setBounds(10, 155, 269, 25);
-		panel_2.add(lblNewLabel_12);
+		panel_3.add(lblNewLabel_12);
 		
 		day = new JComboBox();
-		day.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"}));
+		day.setModel(new DefaultComboBoxModel(new String[] {"Tất cả", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"}));
 		day.setBounds(10, 191, 81, 25);
-		panel_2.add(day);
+		panel_3.add(day);
 		
 		month = new JComboBox();
 		month.addActionListener(new ActionListener() {
@@ -234,9 +250,9 @@ public class HoaDon_app extends JFrame {
 				checkCalender();
 			}
 		});
-		month.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}));
+		month.setModel(new DefaultComboBoxModel(new String[] {"Tất cả", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}));
 		month.setBounds(101, 191, 81, 25);
-		panel_2.add(month);
+		panel_3.add(month);
 		
 		year = new JComboBox();
 		year.addActionListener(new ActionListener() {
@@ -244,42 +260,72 @@ public class HoaDon_app extends JFrame {
 				checkCalender();
 			}
 		});
-		year.setModel(new DefaultComboBoxModel(new String[] {"2023", "2024"}));
+		year.setModel(new DefaultComboBoxModel(new String[] {"Tất cả", "2023", "2024"}));
 		year.setBounds(192, 191, 87, 25);
-		panel_2.add(year);
+		panel_3.add(year);
 		
-		JLabel lblNewLabel_13 = new JLabel("Mã giảm giá :");
+		JLabel lblNewLabel_13 = new JLabel("Mã đồ uống :");
 		lblNewLabel_13.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblNewLabel_13.setBounds(10, 227, 269, 25);
-		panel_2.add(lblNewLabel_13);
+		panel_3.add(lblNewLabel_13);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setBounds(10, 263, 269, 25);
-		panel_2.add(comboBox);
+		JComboBox cboDU = new JComboBox();
+		cboDU.setModel(new DefaultComboBoxModel(new String[] {"Tất cả"}));
+		cboDU.setBounds(10, 263, 269, 25);
+		panel_3.add(cboDU);
 		
-		JLabel lblNewLabel_14 = new JLabel("Nhân viên :");
+		JLabel lblNewLabel_14 = new JLabel("Mã nhân viên :");
 		lblNewLabel_14.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblNewLabel_14.setBounds(10, 299, 269, 25);
-		panel_2.add(lblNewLabel_14);
+		panel_3.add(lblNewLabel_14);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setBounds(10, 335, 269, 25);
-		panel_2.add(comboBox_1);
+		JComboBox cboNV = new JComboBox();
+		cboNV.setModel(new DefaultComboBoxModel(new String[] {"Tất cả"}));
+		cboNV.setBounds(10, 335, 269, 25);
+		panel_3.add(cboNV);
 		
-		btnNewButton = new JButton("Xem chi tiết");
-		btnNewButton.setBackground(new Color(255, 0, 0));
-		btnNewButton.setForeground(new Color(255, 255, 255));
-		btnNewButton.setOpaque(true);
-		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 20));
-		btnNewButton.setBounds(10, 710, 269, 78);
-		panel_2.add(btnNewButton);
+		tim = new JButton("Tìm");
+		tim.setBackground(new Color(255, 0, 0));
+		tim.setForeground(new Color(255, 255, 255));
+		tim.setOpaque(true);
+		tim.setFont(new Font("Tahoma", Font.BOLD, 20));
+		tim.setBounds(10, 710, 269, 78);
+		panel_3.add(tim);
+		
+		JComboBox cboHD = new JComboBox();
+		cboHD.setModel(new DefaultComboBoxModel(new String[] {"Tất cả"}));
+		cboHD.setBounds(10, 47, 269, 25);
+		panel_3.add(cboHD);
+		
+		JComboBox cboKH = new JComboBox();
+		cboKH.setModel(new DefaultComboBoxModel(new String[] {"Tất cả"}));
+		cboKH.setBounds(10, 119, 269, 25);
+		panel_3.add(cboKH);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(687, 80, 949, 777);
 		panel_1.add(scrollPane);
-		
-		table = new JTable();
+		String[] colHeader = { "Mã hóa đơn", "Tổng tiền", "Ngày bán","Mã nhân viên","Mã khách hàng","Số thẻ","Mã đồ uống","Số lượng","Đơn giá"};
+		modelTable = new DefaultTableModel(colHeader, 0) {
+			@Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+		};
+		table = new JTable(modelTable);
 		scrollPane.setViewportView(table);
+		table.getTableHeader().setResizingAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFont(new java.awt.Font("Tahoma", java.awt.Font.PLAIN, 15));
+		scrollPane.setColumnHeader(new JViewport() {
+			@Override public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.height = 32;
+				return d;
+			}
+		});
+		table.setRowHeight(table.getRowHeight()+10);
+		docDuLieuDatabaseVaoTable();
 	}
 	
 	//phương thức đóng menu
@@ -328,6 +374,16 @@ public class HoaDon_app extends JFrame {
 			String index = day.getSelectedItem().toString();
 			day.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28","29","30","31"}));
 			day.setSelectedItem(index);
+		}
+	}
+	
+	private void docDuLieuDatabaseVaoTable() {
+		List<HoaDon> listhd = hd_dao.getAllTableHoaDon();
+		List<ChiTietHoaDon> listct = cthd_dao.getAllTableChiTietHoaDon();
+		for (HoaDon hd: listhd) {
+			for (ChiTietHoaDon cthd : listct) {
+				modelTable.addRow(new Object[] {hd.getMaHoaDon(),hd.getTongTien(),hd.getNgayBan(),hd.getMaNhanVien().getMaNhanVien(),hd.getMaKhachHang().getMaKhachHang(),hd.getSoThe().getSoThe(),cthd.getMaDoUong().getMaDoUong(),cthd.getSoLuong(),cthd.getDonGia()});
+			}
 		}
 	}
 }
