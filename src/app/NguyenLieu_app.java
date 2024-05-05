@@ -8,21 +8,37 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+
+import ConnectDB.ConnectDB;
+import DAO.KhachHang_DAO;
+import DAO.NguyenLieu_DAO;
+import Entity.NguyenLieu;
+
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.swing.JTextField;
+import javax.swing.JViewport;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
-public class NguyenLieu_app extends JFrame {
+public class NguyenLieu_app extends JFrame implements ActionListener, MouseListener {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -33,6 +49,9 @@ public class NguyenLieu_app extends JFrame {
 	private JTable table;
 	private JButton btnNewButton;
 	private JPanel panel_2;
+	private NguyenLieu_DAO nl_dao;
+	private DefaultTableModel modelTable;
+	private JButton btnNewButton1;
 
 	/**
 	 * Launch the application.
@@ -55,6 +74,14 @@ public class NguyenLieu_app extends JFrame {
 	 * Create the frame.
 	 */
 	public NguyenLieu_app() {
+		try {
+			ConnectDB.getInstance().connect();
+			System.out.println("Connected!!");
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		nl_dao=new NguyenLieu_DAO();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1435, 782);
 		contentPane = new JPanel();
@@ -227,12 +254,108 @@ public class NguyenLieu_app extends JFrame {
 		btnNewButton.setBounds(10, 584, 278, 80);
 		panel_2.add(btnNewButton);
 		
+		btnNewButton1 = new JButton("Thêm");
+		btnNewButton1.setBackground(new Color(255, 0, 0));
+		btnNewButton1.setForeground(new Color(255, 255, 255));
+		btnNewButton1.setOpaque(true);
+		btnNewButton1.setFont(new Font("Tahoma", Font.BOLD, 20));
+		btnNewButton1.setBounds(10, 500, 278, 80);
+		panel_2.add(btnNewButton1);
+		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(696, 80, 723, 664);
 		panel_1.add(scrollPane);
 		
-		table = new JTable();
+//		table = new JTable();
+//		scrollPane.setViewportView(table);
+		
+		
+		String[] colHeader = {"Mã nguyên liệu", "Tên Nguyên Liệu", "Số lượng"};
+		modelTable = new DefaultTableModel(colHeader, 0) {
+			@Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+		}
+		};
+		table = new JTable(modelTable);
+		table.getTableHeader().setResizingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFont(new java.awt.Font("Tahoma", java.awt.Font.PLAIN, 15));
 		scrollPane.setViewportView(table);
+		scrollPane.setColumnHeader(new JViewport() {
+			@Override public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.height = 32;
+				return d;
+			}
+		});
+		table.setRowHeight(table.getRowHeight()+10);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table.getSelectedRow();
+		        if (row >= 0) {
+		        	textField.setText((String)modelTable.getValueAt(row, 0));
+		        	textField_1.setText((String)modelTable.getValueAt(row, 1));
+		        	textField_2.setText(String.valueOf(modelTable.getValueAt(row, 2)));
+
+		        }
+			}
+		});
+		docDuLieuDatabaseVaoTable();
+		btnNewButton.addActionListener(this);
+		btnNewButton1.addActionListener(this);
+	}
+	
+	private void docDuLieuDatabaseVaoTable() {
+		List<NguyenLieu> list = nl_dao.getAllTableKhachHang();
+		for (NguyenLieu nl:list) {
+			modelTable.addRow(new Object[] {nl.getMaNguyenLieu(), nl.getTenNguyenLieu(), nl.getSoLuong()});
+		}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object o = e.getSource();
+		if(o.equals(btnNewButton1)) {
+			String ma = textField.getText();
+			String ten = textField_1.getText();
+			int soluong = Integer.parseInt(textField_2.getText());
+			
+			NguyenLieu nl = new NguyenLieu(ma, ten, soluong);
+			try {
+				nl_dao.create(nl);
+				modelTable.addRow(new Object[] {
+						nl.getMaNguyenLieu(), nl.getTenNguyenLieu(),nl.getSoLuong()
+						
+				});
+				textField.requestFocus();
+				
+				;
+			}catch (Exception e1) {
+				
+				JOptionPane.showMessageDialog(this, "Trung");
+			}
+		}
+		
+		if(o.equals(btnNewButton)) {
+			String ma = textField.getText();
+			String ten = textField_1.getText();
+			int soluong = Integer.parseInt(textField_2.getText());
+			NguyenLieu nl = new NguyenLieu(ma, ten, soluong);
+			
+			if(nl_dao.update(nl)) {
+				int row = table.getSelectedRow();
+				modelTable.setValueAt(nl.getMaNguyenLieu(), row, 0);
+				modelTable.setValueAt(nl.getTenNguyenLieu(), row, 1);
+				modelTable.setValueAt(nl.getSoLuong(), row, 2);
+				
+				JOptionPane.showMessageDialog(null, "Cap nhat thanh cong");
+				
+			}
+		}
+		
 	}
 	
 	//phương thức đóng menu
@@ -261,4 +384,36 @@ public class NguyenLieu_app extends JFrame {
 		}).start();
 		
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 }
